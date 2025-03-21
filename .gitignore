@@ -1,0 +1,49 @@
+# 忽略Python相关文件
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 上传文件和输出文件
+uploads/
+outputs/
+
+# 日志文件
+*.log
+translation_debug.log
+paragraph_comparison.log
+
+# 虚拟环境
+venv/
+.env
+.venv
+ENV/
+
+# 敏感信息配置
+config.py
+
+# IDE相关
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 系统文件
+.DS_Store
+Thumbs.db 

@@ -1,0 +1,405 @@
+/* 全局样式 */
+:root {
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --secondary-color: #10b981;
+    --secondary-hover: #059669;
+    --dark-color: #1f2937;
+    --light-color: #f9fafb;
+    --gray-color: #9ca3af;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --info-color: #3b82f6;
+}
+
+body {
+    background-color: #f5f7fb;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #374151;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.content-section {
+    flex: 1;
+    padding: 2rem 0;
+}
+
+/* 头部样式 */
+.header-section {
+    background: linear-gradient(135deg, var(--primary-color), #6366f1);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.app-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.app-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* 卡片样式 */
+.card {
+    border-radius: 12px;
+    border: none;
+    overflow: hidden;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.main-card {
+    background-color: white;
+    margin-bottom: 1.5rem;
+}
+
+.translated-files-card {
+    background-color: white;
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.25rem 1.5rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* 表单样式 */
+.form-label {
+    font-weight: 500;
+    color: var(--dark-color);
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.form-select {
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    height: auto;
+}
+
+.form-text {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.input-group-text {
+    background-color: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    color: #6b7280;
+}
+
+/* 按钮样式 */
+.btn {
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+.btn-success:hover {
+    background-color: var(--secondary-hover);
+    border-color: var(--secondary-hover);
+    transform: translateY(-1px);
+}
+
+.btn-outline-secondary {
+    color: #6b7280;
+    border-color: #d1d5db;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border-color: #9ca3af;
+}
+
+/* 进度条样式 */
+.progress {
+    height: 25px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #e5e7eb;
+}
+
+.progress-bar {
+    background-color: var(--secondary-color);
+    background-image: linear-gradient(45deg, 
+        rgba(255, 255, 255, 0.15) 25%, 
+        transparent 25%, 
+        transparent 50%, 
+        rgba(255, 255, 255, 0.15) 50%, 
+        rgba(255, 255, 255, 0.15) 75%, 
+        transparent 75%, 
+        transparent);
+    background-size: 1rem 1rem;
+}
+
+/* 文件上传区域 */
+.upload-zone {
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+    background-color: #f9fafb;
+}
+
+.upload-zone:hover {
+    border-color: var(--primary-color);
+    background-color: #f5f7fb;
+}
+
+.upload-zone.has-file {
+    border-color: var(--secondary-color);
+    background-color: rgba(16, 185, 129, 0.05);
+}
+
+.upload-zone .form-control {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.upload-icon {
+    z-index: 1;
+}
+
+.upload-icon i {
+    font-size: 3rem;
+    color: #9ca3af;
+    margin-bottom: 1rem;
+}
+
+.upload-zone.has-file .upload-icon i {
+    color: var(--secondary-color);
+}
+
+.upload-zone p {
+    margin-bottom: 0;
+    color: #6b7280;
+}
+
+/* 文件信息卡片 */
+.file-info {
+    padding: 1rem;
+    background-color: #f9fafb;
+    border-radius: 12px;
+}
+
+.file-icon i {
+    font-size: 2.5rem;
+}
+
+/* 标签页样式 */
+.nav-tabs {
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1.5rem;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    color: #6b7280;
+    font-weight: 500;
+    padding: 1rem 1.5rem;
+    border-radius: 0;
+    margin-right: 1rem;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--primary-color);
+    border-bottom: 2px solid #d1d5db;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    background-color: transparent;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+/* API测试结果 */
+.api-tester {
+    background-color: #f9fafb;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.test-output {
+    padding: 1rem;
+    background-color: #f3f4f6;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    font-family: 'Courier New', monospace;
+}
+
+/* 提示样式 */
+.translation-tips {
+    background-color: #eff6ff;
+    border-left: 4px solid var(--info-color);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+}
+
+.translation-tips i {
+    color: var(--info-color);
+    margin-right: 0.5rem;
+}
+
+/* 列表样式 */
+.list-group-item {
+    border-left: none;
+    border-right: none;
+    padding: 1rem 1.5rem;
+    transition: background-color 0.2s;
+    border-color: #e5e7eb;
+}
+
+.list-group-item:first-child {
+    border-top: none;
+}
+
+.list-group-item:hover {
+    background-color: #f9fafb;
+}
+
+/* 表单开关 */
+.form-check-input:checked {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+.form-switch .form-check-input {
+    width: 3rem;
+    height: 1.5rem;
+}
+
+/* 页脚样式 */
+.footer {
+    background-color: #f3f4f6;
+    padding: 1.5rem 0;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+/* 动画效果 */
+.fade-in {
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* 文档预览样式 */
+#document-preview {
+    background-color: #f9fafb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.preview-header {
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.preview-page {
+    border-radius: 8px;
+    background-color: white;
+    padding: 1rem;
+    border: 1px solid #e5e7eb;
+}
+
+.preview-page-title {
+    color: var(--dark-color);
+    font-weight: 600;
+}
+
+.preview-paragraph {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #4b5563;
+    border-color: var(--primary-color) !important;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.preview-container {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .app-title {
+        font-size: 2rem;
+    }
+    
+    .header-section {
+        padding: 1.5rem 0;
+    }
+    
+    .card-body {
+        padding: 1.25rem;
+    }
+    
+    .preview-container {
+        max-height: 300px;
+    }
+} 

@@ -1,0 +1,18 @@
+# 示例配置文件 - 复制为 config.py 并修改以下参数
+
+# DeepSeek API配置
+API_KEY = "your-api-key-here"  # 这里填写你的DeepSeek API密钥
+API_URL = "https://ark.cn-beijing.volces.com/api/v3/chat/completions"
+API_MODEL = "deepseek-v3-241226"
+
+# 翻译设置
+BATCH_SIZE = 3  # 每批处理的段落数量
+MAX_CONCURRENT_REQUESTS = 3  # 并行处理的请求数量
+TEMPERATURE = 0.3  # 模型温度参数
+
+# 文件路径设置
+OUTPUT_DIR = "./outputs"  # 输出文件夹
+
+# 其他设置
+RETRIES = 3  # API请求失败时的重试次数
+RETRY_DELAY = 2  # 重试间隔（秒） 

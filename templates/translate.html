@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>翻译设置 - PDF翻译助手</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="main-container">
+        <div class="header-section">
+            <div class="container">
+                <h1 class="app-title"><i class="fas fa-language"></i> PDF翻译助手</h1>
+                <p class="app-subtitle">专业的PDF文档翻译工具 | DeepSeek API驱动</p>
+            </div>
+        </div>
+        
+        <div class="container content-section">
+            <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-8">
+                    <!-- 显示flash消息 -->
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    <div class="alert alert-warning alert-dismissible fade show">
+                        {% for message in messages %}
+                        {{ message }}
+                        {% endfor %}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                    
+                    <div class="card main-card">
+                        <div class="card-body">
+                            <div class="file-info mb-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="file-icon me-3">
+                                        <i class="fas fa-file-pdf text-danger"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="mb-0">{{ filename }}</h4>
+                                        <span class="text-muted">准备翻译设置</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 文档预览 -->
+                            <div id="document-preview" class="mb-4">
+                                <div class="preview-header d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0"><i class="fas fa-eye"></i> 文档预览</h5>
+                                    <button id="toggle-preview" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-chevron-down"></i> 展开
+                                    </button>
+                                </div>
+                                <div id="preview-content" class="d-none">
+                                    <div class="text-center py-3">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">加载中...</span>
+                                        </div>
+                                        <p>正在加载预览...</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 翻译选项表单 -->
+                            <form id="translation-form" class="mb-4">
+                                <input type="hidden" id="filename" name="filename" value="{{ filename }}">
+                                
+                                <div class="mb-4">
+                                    <label for="api_key" class="form-label">DeepSeek API密钥</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                        <input type="text" class="form-control" id="api_key" name="api_key" placeholder="输入您的DeepSeek API密钥">
+                                    </div>
+                                    <div class="form-text">使用火山方舟上的DeepSeek V3模型</div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4 mb-4">
+                                        <label for="batch_size" class="form-label">批处理大小</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-layer-group"></i></span>
+                                            <input type="number" class="form-control" id="batch_size" name="batch_size" min="1" max="10" value="3">
+                                        </div>
+                                        <div class="form-text">每批处理的段落数量</div>
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-4">
+                                        <label for="max_concurrent" class="form-label">并行进程数</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-microchip"></i></span>
+                                            <select class="form-select" id="max_concurrent" name="max_concurrent">
+                                                <option value="1">1个进程</option>
+                                                <option value="2">2个进程</option>
+                                                <option value="3" selected>3个进程</option>
+                                                <option value="4">4个进程</option>
+                                                <option value="5">5个进程</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-text">同时运行的翻译进程数（1-5）</div>
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-4">
+                                        <label for="sentences_per_paragraph" class="form-label">段落分割</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-paragraph"></i></span>
+                                            <select class="form-select" id="sentences_per_paragraph" name="sentences_per_paragraph">
+                                                <option value="1">每句一段</option>
+                                                <option value="2">每2句一段</option>
+                                                <option value="3">每3句一段</option>
+                                                <option value="4" selected>每4句一段</option>
+                                                <option value="5">每5句一段</option>
+                                                <option value="6">每6句一段</option>
+                                                <option value="8">每8句一段</option>
+                                                <option value="10">每10句一段</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-text">句号后有换行符会单独成段</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="comparison_mode" name="comparison_mode">
+                                        <label class="form-check-label" for="comparison_mode">对照模式（同时显示原文和译文）</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="translation-tips alert alert-info">
+                                    <i class="fas fa-info-circle"></i> 
+                                    <span>提示：更大的批处理大小可能会加快翻译速度，但可能会降低质量。增加并行进程数可以提高处理速度，但会增加API调用频率。</span>
+                                </div>
+                                
+                                <div class="d-grid gap-2">
+                                    <button type="button" id="start-translation" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-play-circle"></i> 开始翻译
+                                    </button>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary flex-grow-1">
+                                            <i class="fas fa-arrow-left"></i> 返回主页
+                                        </a>
+                                        <button type="button" id="clear-cache-btn" class="btn btn-outline-danger flex-grow-1">
+                                            <i class="fas fa-trash-alt"></i> 清除所有缓存
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                            
+                            <!-- 清除缓存结果消息 -->
+                            <div id="clear-cache-result" class="alert d-none mt-3"></div>
+                            
+                            <!-- 翻译进度显示 -->
+                            <div id="progress-container" class="mt-4 d-none">
+                                <h4 class="mb-3"><i class="fas fa-tasks"></i> 翻译进度</h4>
+                                <div class="progress mb-3" style="height: 25px;">
+                                    <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                                </div>
+                                <div id="progress-text" class="text-center">准备中...</div>
+                                
+                                <div id="completed-container" class="mt-4 alert alert-success d-none">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <i class="fas fa-check-circle fa-3x"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-2">翻译完成！</h5>
+                                            <a id="download-link" href="#" class="btn btn-success">
+                                                <i class="fas fa-download"></i> 下载翻译结果
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="footer mt-5">
+            <div class="container text-center">
+                <p>基于DeepSeek V3模型 · 使用Flask框架开发</p>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- 预览段落模板 -->
+    <template id="preview-template">
+        <div class="preview-page mb-3">
+            <h6 class="preview-page-title mb-2">第 <span class="page-number"></span> 页预览</h6>
+            <div class="preview-paragraphs"></div>
+        </div>
+    </template>
+    
+    <template id="paragraph-template">
+        <div class="preview-paragraph mb-2 p-2 border-start border-3 border-primary bg-light">
+        </div>
+    </template>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='js/translate.js') }}"></script>
+    <script>
+        // 页面加载时从localStorage读取API密钥
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedApiKey = localStorage.getItem('deepseek_api_key');
+            if (savedApiKey) {
+                document.getElementById('api_key').value = savedApiKey;
+            }
+            
+            // 当用户输入API密钥时保存到localStorage
+            document.getElementById('api_key').addEventListener('input', function() {
+                const apiKey = this.value.trim();
+                localStorage.setItem('deepseek_api_key', apiKey);
+            });
+        });
+    </script>
+</body>
+</html> 

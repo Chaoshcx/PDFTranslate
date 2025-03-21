@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF翻译助手</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="main-container">
+        <div class="header-section">
+            <div class="container">
+                <h1 class="app-title"><i class="fas fa-language"></i> PDF翻译助手</h1>
+                <p class="app-subtitle">专业的PDF文档翻译工具 | DeepSeek API驱动</p>
+            </div>
+        </div>
+
+        <div class="container content-section">
+            <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-8">
+                    <!-- 显示flash消息 -->
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                    <div class="alert alert-warning alert-dismissible fade show">
+                        {% for message in messages %}
+                        {{ message }}
+                        {% endfor %}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                    
+                    <div class="card main-card">
+                        <div class="card-body">
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload" type="button" role="tab" aria-controls="upload" aria-selected="true">
+                                        <i class="fas fa-file-upload"></i> 文件上传
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="test-tab" data-bs-toggle="tab" data-bs-target="#test" type="button" role="tab" aria-controls="test" aria-selected="false">
+                                        <i class="fas fa-vial"></i> API测试
+                                    </button>
+                                </li>
+                            </ul>
+                            
+                            <div class="tab-content p-3" id="myTabContent">
+                                <!-- 文件上传区域 -->
+                                <div class="tab-pane fade show active" id="upload" role="tabpanel">
+                                    <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" class="mb-4">
+                                        <div class="upload-zone" id="dropzone">
+                                            <input type="file" class="form-control" id="file" name="file" accept=".pdf">
+                                            <div class="upload-icon">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                                <h4>拖放PDF文件到此处</h4>
+                                                <p>或点击选择文件</p>
+                                            </div>
+                                            <div class="file-info mt-3 d-none" id="file-details">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-file-pdf text-danger me-2"></i>
+                                                    <span id="file-name">未选择文件</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-4 mb-4">
+                                            <label for="api_key" class="form-label">DeepSeek API密钥</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                                <input type="text" class="form-control" id="api_key" name="api_key" placeholder="输入您的DeepSeek API密钥">
+                                            </div>
+                                            <div class="form-text">使用火山方舟上的DeepSeek V3模型进行翻译</div>
+                                        </div>
+                                        
+                                        <div class="d-grid gap-2">
+                                            <button type="submit" class="btn btn-primary btn-lg" id="upload-btn">
+                                                <i class="fas fa-upload"></i> 上传并继续
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                                
+                                <!-- API测试区域 -->
+                                <div class="tab-pane fade" id="test" role="tabpanel">
+                                    <div class="api-tester">
+                                        <div class="mb-4">
+                                            <label for="test_api_key" class="form-label">DeepSeek API密钥</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                                <input type="text" class="form-control" id="test_api_key" placeholder="输入您的DeepSeek API密钥">
+                                            </div>
+                                            <div class="form-text">使用同一个API密钥测试和翻译</div>
+                                        </div>
+                                        
+                                        <div class="mb-4">
+                                            <label for="test_text" class="form-label">测试文本 (英文)</label>
+                                            <textarea class="form-control" id="test_text" rows="5" placeholder="输入要测试翻译的英文文本"></textarea>
+                                        </div>
+                                        
+                                        <div class="d-grid mb-4">
+                                            <button type="button" class="btn btn-primary" id="test-api-btn">
+                                                <i class="fas fa-vial"></i> 测试API
+                                            </button>
+                                        </div>
+                                        
+                                        <div id="test-result" class="d-none">
+                                            <h5>翻译结果:</h5>
+                                            <div class="test-output p-3 mb-3" id="result-content"></div>
+                                        </div>
+                                        
+                                        <div id="test-error" class="alert alert-danger d-none">
+                                            <i class="fas fa-exclamation-circle"></i> <span id="error-message"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 已翻译文件列表 -->
+                    {% if translated_files %}
+                    <div class="card translated-files-card mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-history"></i> 已翻译的文件</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group">
+                                {% for file in translated_files %}
+                                <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-file-word text-primary me-3"></i>
+                                        <span>{{ file }}</span>
+                                    </div>
+                                    <a href="{{ url_for('download_file', filename=file) }}" class="btn btn-sm btn-success">
+                                        <i class="fas fa-download"></i> 下载
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- 正在进行的翻译任务进度显示 -->
+                    <div class="card mt-4" id="active-translations-card" style="display:none;">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-tasks"></i> 正在进行的翻译任务</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="active-translations-list" class="list-group">
+                                <!-- 这里将通过JavaScript动态添加正在进行的翻译任务 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 清除缓存按钮 -->
+                <div class="col-md-10 col-lg-8 mt-4">
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-danger" id="clear-cache-btn">
+                            <i class="fas fa-trash-alt"></i> 清除所有缓存文件
+                        </button>
+                        <div id="clear-cache-result" class="alert d-none mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="footer mt-5">
+            <div class="container text-center">
+                <p>基于DeepSeek V3模型 · 使用Flask框架开发</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+    <script>
+        // 在页面加载时检查是否有保存的API密钥
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedApiKey = localStorage.getItem('deepseek_api_key');
+            if (savedApiKey) {
+                document.getElementById('api_key').value = savedApiKey;
+                document.getElementById('test_api_key').value = savedApiKey;
+            }
+            
+            // 清除缓存功能
+            document.getElementById('clear-cache-btn').addEventListener('click', function() {
+                if (!confirm('确定要清除所有缓存文件吗？这将删除所有上传的PDF和翻译结果。')) {
+                    return;
+                }
+                
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 清除中...';
+                
+                const resultDiv = document.getElementById('clear-cache-result');
+                
+                // 发送清除缓存请求
+                fetch('/clear_cache', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-trash-alt"></i> 清除所有缓存文件';
+                    
+                    resultDiv.classList.remove('d-none', 'alert-success', 'alert-danger');
+                    if (data.status === 'success') {
+                        resultDiv.classList.add('alert-success');
+                        resultDiv.innerHTML = '<i class="fas fa-check-circle"></i> ' + data.message;
+                        // 清除localStorage中保存的API密钥
+                        localStorage.removeItem('deepseek_api_key');
+                        document.getElementById('api_key').value = '';
+                        document.getElementById('test_api_key').value = '';
+                        // 2秒后刷新页面
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        resultDiv.classList.add('alert-danger');
+                        resultDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + data.message;
+                    }
+                })
+                .catch(error => {
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-trash-alt"></i> 清除所有缓存文件';
+                    resultDiv.classList.remove('d-none');
+                    resultDiv.classList.add('alert-danger');
+                    resultDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> 请求失败: ' + error;
+                });
+            });
+            
+            // 上传文件区域交互
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('file');
+            const fileDetails = document.getElementById('file-details');
+            const fileName = document.getElementById('file-name');
+            
+            // 拖放事件
+            dropzone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                dropzone.classList.add('border-primary');
+            });
+            
+            dropzone.addEventListener('dragleave', function() {
+                dropzone.classList.remove('border-primary');
+            });
+            
+            dropzone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                dropzone.classList.remove('border-primary');
+                
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    updateFileInfo();
+                }
+            });
+            
+            // 文件选择变更
+            fileInput.addEventListener('change', updateFileInfo);
+            
+            function updateFileInfo() {
+                if (fileInput.files.length) {
+                    const file = fileInput.files[0];
+                    fileName.textContent = file.name;
+                    fileDetails.classList.remove('d-none');
+                    dropzone.classList.add('has-file');
+                } else {
+                    fileDetails.classList.add('d-none');
+                    dropzone.classList.remove('has-file');
+                }
+            }
+            
+            // API密钥同步
+            document.getElementById('api_key').addEventListener('input', function() {
+                const apiKey = this.value.trim();
+                document.getElementById('test_api_key').value = apiKey;
+                localStorage.setItem('deepseek_api_key', apiKey);
+            });
+            
+            document.getElementById('test_api_key').addEventListener('input', function() {
+                const apiKey = this.value.trim();
+                document.getElementById('api_key').value = apiKey;
+                localStorage.setItem('deepseek_api_key', apiKey);
+            });
+            
+            // API测试功能
+            document.getElementById('test-api-btn').addEventListener('click', function() {
+                const apiKey = document.getElementById('test_api_key').value.trim();
+                const testText = document.getElementById('test_text').value.trim();
+                const testResult = document.getElementById('test-result');
+                const testError = document.getElementById('test-error');
+                const resultContent = document.getElementById('result-content');
+                const errorMessage = document.getElementById('error-message');
+                
+                if (!apiKey) {
+                    testError.classList.remove('d-none');
+                    errorMessage.textContent = '请输入API密钥';
+                    testResult.classList.add('d-none');
+                    return;
+                }
+                
+                if (!testText) {
+                    testError.classList.remove('d-none');
+                    errorMessage.textContent = '请输入测试文本';
+                    testResult.classList.add('d-none');
+                    return;
+                }
+                
+                // 显示加载状态
+                this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 测试中...';
+                this.disabled = true;
+                testError.classList.add('d-none');
+                testResult.classList.add('d-none');
+                
+                // 发送API请求
+                fetch('/test_api', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        api_key: apiKey,
+                        text: testText
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    this.innerHTML = '<i class="fas fa-vial"></i> 测试API';
+                    this.disabled = false;
+                    
+                    if (data.status === 'success') {
+                        resultContent.textContent = data.translation;
+                        testResult.classList.remove('d-none');
+                        testError.classList.add('d-none');
+                    } else {
+                        errorMessage.textContent = data.message || '翻译失败';
+                        testError.classList.remove('d-none');
+                        testResult.classList.add('d-none');
+                    }
+                })
+                .catch(error => {
+                    this.innerHTML = '<i class="fas fa-vial"></i> 测试API';
+                    this.disabled = false;
+                    errorMessage.textContent = '请求失败: ' + error;
+                    testError.classList.remove('d-none');
+                    testResult.classList.add('d-none');
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
