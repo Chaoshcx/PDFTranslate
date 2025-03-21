@@ -23,6 +23,9 @@
 ### 安装步骤
 
 1. 克隆或下载本仓库
+   ```
+   git clone https://github.com/Chaoshcx/PDFTranslate.git
+   ```
 2. 安装依赖项：
    ```
    pip install -r requirements.txt
