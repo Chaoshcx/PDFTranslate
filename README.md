@@ -1,6 +1,6 @@
 # PDF翻译助手
 
-基于DeepSeek V3 API的PDF文档翻译工具，将英文PDF文档自动翻译成中文，并提供美观的Web界面。
+基于火山方舟的DeepSeek V3 API（运行速度比较稳定）的PDF文档翻译工具，将英文PDF文档自动翻译成中文，并提供美观的Web界面。
 
 ## 功能特点
 
@@ -18,7 +18,7 @@
 ### 前置要求
 
 - Python 3.7+
-- [DeepSeek API](https://ark.volcengine.com/deepseek/api)账号及API密钥
+- [DeepSeek API申请地址](https://console.volcengine.com/ark)申请账号及API密钥
 
 ### 安装步骤
 
